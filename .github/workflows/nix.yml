@@ -40,6 +40,15 @@ jobs:
           name: ${{ vars.CACHIX_CACHE }}
           # Without the token (forks, pull requests from forks) the cache is only read.
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          # Pushed below: only the package's runtime closure, not the crate sources and other
+          # build-only paths the job also creates.
+          skipPush: true
       - run: nix flake check --no-build
       - run: nix build .#laqta --print-build-logs
       - run: ./result/bin/laqta --version
+      - name: Push to Cachix
+        if: env.CACHIX_PUSH == 'true'
+        # Paths already on cache.nixos.org are skipped, so this is Laqta and the FFmpeg it builds.
+        run: cachix push "${{ vars.CACHIX_CACHE }}" ./result
+    env:
+      CACHIX_PUSH: ${{ vars.CACHIX_CACHE != '' && secrets.CACHIX_AUTH_TOKEN != '' }}
