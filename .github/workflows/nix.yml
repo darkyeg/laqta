@@ -1,8 +1,8 @@
 name: Nix
 
-# Builds the flake package and, when the CACHIX_AUTH_TOKEN secret is set, pushes it to the
-# Cachix cache named by the CACHIX_CACHE repository variable, so Nix users download the build
-# instead of compiling it.
+# Builds the flake package with the Cachix cache named by the CACHIX_CACHE repository variable.
+# Builds of main and of release tags are also pushed there (with the CACHIX_AUTH_TOKEN secret),
+# so Nix users download them instead of compiling; pull request builds only read from it.
 
 on:
   push:
@@ -51,4 +51,4 @@ jobs:
         # Paths already on cache.nixos.org are skipped, so this is Laqta and the FFmpeg it builds.
         run: cachix push "${{ vars.CACHIX_CACHE }}" ./result
     env:
-      CACHIX_PUSH: ${{ vars.CACHIX_CACHE != '' && secrets.CACHIX_AUTH_TOKEN != '' }}
+      CACHIX_PUSH: ${{ github.event_name != 'pull_request' && vars.CACHIX_CACHE != '' && secrets.CACHIX_AUTH_TOKEN != '' }}
