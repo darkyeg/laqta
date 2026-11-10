@@ -60,6 +60,23 @@ Every file has a `.sha256` next to it on the [Releases](../../releases) page.
   Debian or Ubuntu you can instead install the package with
   `sudo apt install ./laqta-linux-amd64.deb`. The archive holds the plain binaries, or you can
   [build from source](#%EF%B8%8F-build-from-source).
+- **NixOS / Nix:** try it with `nix run github:Etherll/laqta`, or install it from the flake
+  (below). The Nix package brings its own FFmpeg and ONNX Runtime from Nixpkgs instead of
+  downloading them on first use. Text recognition and the local models need ONNX Runtime (about 240 MiB); leave it out
+  with `laqta.override { withOnnxruntime = false; }`.
+
+  ```nix
+  # flake.nix of your system: add the input (sharing your nixpkgs, so nothing is duplicated),
+  # then the package
+  inputs.laqta.url = "github:Etherll/laqta";
+  inputs.laqta.inputs.nixpkgs.follows = "nixpkgs";
+  # NixOS:        environment.systemPackages = [ inputs.laqta.packages.${pkgs.system}.default ];
+  # Home Manager: home.packages = [ inputs.laqta.packages.${pkgs.system}.default ];
+  ```
+
+  On Wayland, screen capture and global shortcuts go through the desktop portal, so keep
+  `xdg.portal.enable = true` with your desktop's portal (GNOME and KDE set this up themselves;
+  on Hyprland or Sway add `xdg-desktop-portal-hyprland` or `xdg-desktop-portal-wlr`).
 
 Laqta lives in the tray. Press <kbd>Ctrl</kbd>+<kbd>PrtSc</kbd> to capture a region,
 <kbd>PrtSc</kbd> for the whole screen, or set your own shortcuts in **Settings → Shortcuts**.
@@ -158,6 +175,9 @@ sudo apt install libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libvulkan-
 cargo build --release -p laqta
 ./target/release/laqta
 ```
+
+On NixOS, `nix build` builds the package into `./result`, and `nix develop` opens a shell with
+the toolchain and libraries for `cargo build` and `cargo run`.
 
 #### Windows
 With the MSVC build tools and [vcpkg](https://vcpkg.io):

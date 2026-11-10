@@ -22,6 +22,16 @@ pub fn library_path(dir: &Path, entry: &OrtArchive) -> PathBuf {
     dir.join(name)
 }
 
+/// The library the runtime loads: the one a distribution package names at build time
+/// (`LAQTA_ONNXRUNTIME`), so a packaged Laqta uses the distribution's own build instead of
+/// downloading one, else the downloaded copy in `dir`.
+pub fn runtime_library(dir: &Path, entry: &OrtArchive) -> PathBuf {
+    match option_env!("LAQTA_ONNXRUNTIME") {
+        Some(packaged) if !packaged.is_empty() => PathBuf::from(packaged),
+        _ => library_path(dir, entry),
+    }
+}
+
 /// Copies the library out of a `.tgz` or `.zip` archive.
 pub fn extract_library(archive: &Path, entry: &OrtArchive, dir: &Path) -> Result<PathBuf, MlError> {
     let io = |e: std::io::Error| MlError::Io(e.to_string());
