@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: Swatinem/rust-cache@v2
       - run: >-
           sudo apt-get update && sudo apt-get install -y
@@ -84,7 +84,7 @@ jobs:
           ./dist/laqta-linux-x86_64.AppImage --appimage-extract-and-run --version
       - name: Checksums
         run: cd dist && for f in *.tar.gz *.deb *.AppImage; do sha256sum "$f" > "$f.sha256"; done
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: linux
           path: dist/*
@@ -96,7 +96,7 @@ jobs:
     env:
       VCPKGRS_TRIPLET: x64-windows-static-md
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: Swatinem/rust-cache@v2
       - run: vcpkg install "sqlite3[fts5]:x64-windows-static-md"
       - run: echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" >> $env:GITHUB_ENV
@@ -126,7 +126,7 @@ jobs:
             $hash = (Get-FileHash "dist/$f" -Algorithm SHA256).Hash.ToLower()
             "$hash  $f" | Out-File -Encoding ascii "dist/$f.sha256"
           }
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: windows
           path: dist/*
@@ -139,12 +139,12 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with: { path: dist, merge-multiple: true }
       - name: SHA256SUMS
         # The in-app updater checks the Windows update package against this list.
         run: cd dist && sha256sum $(ls | grep -v '\.sha256$') > SHA256SUMS && cat SHA256SUMS
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           draft: true
           prerelease: ${{ contains(github.ref_name, '-') }}

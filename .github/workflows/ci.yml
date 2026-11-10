@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@v2
         with: { tool: "cargo-deny@0.20.2" }
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@v2
         with: { tool: "cargo-nextest@0.9.151" }
@@ -61,7 +61,7 @@ jobs:
         env: { DISPLAY: ":99" }
       - name: Keep the test report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: junit-linux-x11
           path: target/nextest/ci/junit.xml
@@ -74,7 +74,7 @@ jobs:
     runs-on: ubuntu-26.04
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@v2
         with: { tool: "cargo-nextest@0.9.151" }
@@ -89,7 +89,7 @@ jobs:
       - run: cargo nextest run -p laqta-platform-linux --profile ci
       - name: Keep the test report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: junit-linux-wayland
           path: target/nextest/ci/junit.xml
@@ -102,7 +102,7 @@ jobs:
     env:
       VCPKGRS_TRIPLET: x64-windows-static-md
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: Swatinem/rust-cache@v2
       # SQLite for laqta-library (ADR 026).
       - run: vcpkg install "sqlite3[fts5]:x64-windows-static-md"
@@ -114,7 +114,7 @@ jobs:
       - run: cargo nextest run --workspace --profile ci
       - name: Keep the test report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: junit-windows
           path: target/nextest/ci/junit.xml
