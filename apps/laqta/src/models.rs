@@ -32,14 +32,14 @@ pub fn models_dir(data: &Path) -> PathBuf {
 pub fn runtime(data: &Path, options: &ModelOptions) -> Option<Arc<Runtime>> {
     let dir = models_dir(data);
     let ort = laqta_ml::install::ort_for_host()?;
-    Some(Arc::new(Runtime::new(laqta_ml::install::library_path(&dir, ort), dir, provider(options.provider))))
+    Some(Arc::new(Runtime::new(laqta_ml::install::runtime_library(&dir, ort), dir, provider(options.provider))))
 }
 
 /// Downloads ONNX Runtime when it is not there yet, reporting through `progress`.
 pub async fn ensure_onnxruntime(data: &Path, progress: laqta_ml::Progress) -> Result<(), String> {
     let dir = models_dir(data);
     let ort = laqta_ml::install::ort_for_host().ok_or("no ONNX Runtime build for this platform")?;
-    if laqta_ml::install::library_path(&dir, ort).exists() {
+    if laqta_ml::install::runtime_library(&dir, ort).exists() {
         return Ok(());
     }
     laqta_ml::install::install_onnxruntime(&dir, progress, Arc::new(AtomicBool::new(false))).await.map(|_| ()).map_err(|e| e.to_string())
