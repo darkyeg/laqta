@@ -66,13 +66,21 @@ Every file has a `.sha256` next to it on the [Releases](../../releases) page.
   with `laqta.override { withOnnxruntime = false; }`.
 
   ```nix
-  # flake.nix of your system: add the input (sharing your nixpkgs, so nothing is duplicated),
-  # then the package
+  # flake.nix of your system: add the input, then the package
   inputs.laqta.url = "github:Etherll/laqta";
-  inputs.laqta.inputs.nixpkgs.follows = "nixpkgs";
-  # NixOS:        environment.systemPackages = [ inputs.laqta.packages.${pkgs.system}.default ];
-  # Home Manager: home.packages = [ inputs.laqta.packages.${pkgs.system}.default ];
+  # NixOS:        environment.systemPackages = [ inputs.laqta.packages.${pkgs.stdenv.hostPlatform.system}.default ];
+  # Home Manager: home.packages = [ inputs.laqta.packages.${pkgs.stdenv.hostPlatform.system}.default ];
+
+  # NixOS: download the build from the binary cache instead of compiling it (about 35 minutes)
+  nix.settings = {
+    substituters = [ "https://darkyeg.cachix.org" ];
+    trusted-public-keys = [ "darkyeg.cachix.org-1:H5hz0hN1WT4IPmI+m8jC7QRna/qGV82waEcLA1MV5IM=" ];
+  };
   ```
+
+  The cache holds builds made with the flake's own Nixpkgs. Adding
+  `inputs.laqta.inputs.nixpkgs.follows = "nixpkgs";` builds Laqta with your Nixpkgs instead, which
+  avoids a second copy of the libraries it shares with your system but compiles it on your machine.
 
   On Wayland, screen capture and global shortcuts go through the desktop portal, so keep
   `xdg.portal.enable = true` with your desktop's portal (GNOME and KDE set this up themselves;

@@ -1,6 +1,13 @@
 {
   description = "Laqta: capture, record, mark up and share your screen";
 
+  # The CI build (.github/workflows/nix.yml) is pushed here. Nix asks before using it, and uses it
+  # only for trusted users; a NixOS system adds it in `nix.settings` instead (see the README).
+  nixConfig = {
+    extra-substituters = [ "https://darkyeg.cachix.org" ];
+    extra-trusted-public-keys = [ "darkyeg.cachix.org-1:H5hz0hN1WT4IPmI+m8jC7QRna/qGV82waEcLA1MV5IM=" ];
+  };
+
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
   outputs =
